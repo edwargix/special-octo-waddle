@@ -1,0 +1,12 @@
+
+for (i = 0; i < lim - 1 && (c = getchar()) != '\n' && c != EOF; ++i) {
+    if ((c = getchar()) != '\n') {
+        if (c != EOF) {
+           s[i] = c;
+        } else {
+           break;
+        }
+    } else {
+        break;
+    }
+}
