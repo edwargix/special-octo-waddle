@@ -7,6 +7,9 @@
 int getop(char []);
 void push(double);
 double pop(void);
+double last(void);
+void clear(void);
+void swap(void);
 
 /* reverse Polish calculator */
 int main()
@@ -47,6 +50,15 @@ int main()
     case '\n':
       printf("\t%.8g\n", pop());
       break;
+    case 'p': /* p: print top element of stack */
+      printf("\t%.8g\n", last());
+      break;
+    case 'c': /* c: clear stack */
+      clear();
+      break;
+    case 't':
+      swap();
+      break;
     default:
       printf("error: unknown command %s\n", s);
       break;
@@ -79,6 +91,31 @@ double pop(void)
     printf("error: stack empty\n");
     return 0.0;
   }
+}
+
+/* last: return top value from stack */
+double last(void)
+{
+  if (sp > 0)
+    return val[sp - 1];
+  else {
+    printf("error: stack empty\n");
+    return 0.0;
+  }
+}
+
+/* clear: wipe stack */
+void clear(void)
+{
+  sp = 0;
+}
+
+/* swap: swap top two elements */
+void swap(void)
+{
+  double temp = val[sp - 1];
+  val[sp - 1] = val[sp - 2];
+  val[sp - 2] = temp;
 }
 
 
