@@ -37,6 +37,13 @@ int main()
       else
         printf("error: zero divisor\n");
       break;
+    case '%': /* casts all doubles to integers */
+      op2 = pop();
+      if (op2 != 0.0)
+        push((int)pop() % (int)op2);
+      else
+        printf("error: zero divisor\n");
+      break;
     case '\n':
       printf("\t%.8g\n", pop());
       break;
@@ -88,9 +95,13 @@ int getop(char s[])
   while ((s[0] = c = getch()) == ' ' || c == '\t')
     ;
   s[1] = '\0';
-  if (!isdigit(c) && c != '.')
+  if (!isdigit(c) && c != '.' && c != '-')
     return c; /* not a number */
   i = 0;
+  if (c == '-' && !isdigit(s[++i] = c = getch())) {
+    s[i] = '\0';
+    return '-';
+  }
   if (isdigit(c)) /* collect integer parts */
     while (isdigit(s[++i] = c = getch()))
       ;
