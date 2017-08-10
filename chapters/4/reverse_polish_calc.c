@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h> /* for atof() */
+#include <math.h> /* for sin(), exp(), pow() */
 
 #define MAXOP 100 /* max size of operand or operator */
 #define NUMBER '0' /* signal that a number was found */
@@ -58,6 +59,16 @@ int main()
       break;
     case 't':
       swap();
+      break;
+    case 's': /* s: sine */
+      push(sin(pop()));
+      break;
+    case 'e': /* e: exp */
+      push(exp(pop()));
+      break;
+    case '^': /* ^: pow */
+      op2 = pop();
+      push(pow(pop(), op2));
       break;
     default:
       printf("error: unknown command %s\n", s);
