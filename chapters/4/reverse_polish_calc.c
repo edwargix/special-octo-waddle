@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> /* for atof() */
 #include <math.h> /* for sin(), exp(), pow() */
+#include <stdbool.h>
 
 #define MAXOP 100 /* max size of operand or operator */
 #define NUMBER '0' /* signal that a number was found */
@@ -12,14 +13,24 @@ double last(void);
 void clear(void);
 void swap(void);
 
+int save_var(char, double);
+int get_var(char, double*);
+
 /* reverse Polish calculator */
 int main()
 {
   int type;
-  double op2;
+  double op2, var;
   char s[MAXOP];
+  bool saving = false;
 
   while ((type = getop(s)) != EOF) {
+    if (saving) {
+      save_var(type, last());
+      saving = false;
+      continue;
+    }
+
     switch (type) {
     case NUMBER:
       push(atof(s));
@@ -70,8 +81,14 @@ int main()
       op2 = pop();
       push(pow(pop(), op2));
       break;
+    case '=': /* =: save top of stack in variable that follows */
+      saving = true;
+      break;
     default:
-      printf("error: unknown command %s\n", s);
+      if (get_var(type, &var))
+        push(var);
+      else
+        printf("error: unknown var/command %s\n", s);
       break;
     }
   }
@@ -87,9 +104,10 @@ double val[MAXVAL]; /* value stack */
 /* push: push f onto value stack */
 void push(double f)
 {
-  if (sp < MAXVAL)
+  if (sp < MAXVAL) {
     val[sp++] = f;
-  else
+    save_var('l', f); /* variable holding last value */
+  } else
     printf("error: stack full, can't push %g\n", f);
 }
 
@@ -127,6 +145,36 @@ void swap(void)
   double temp = val[sp - 1];
   val[sp - 1] = val[sp - 2];
   val[sp - 2] = temp;
+}
+
+
+#include <ctype.h>
+
+/* storage for variables */
+double vars[26];
+
+/* save_var: set var `c' to `d'; return 1 on success, 0 on failure */
+int save_var(char c, double d)
+{
+  if (islower(c)) {
+    vars[c - 'a'] = d;
+    return 1;
+  }
+
+  printf("error: save_var: invalid variable name\n");
+  return 0;
+}
+
+/* get_var: put value of var `c' in `d'; return 1 on success, 0 on failure */
+int get_var(char c, double *d)
+{
+  if (islower(c)) {
+    *d = vars[c - 'a'];
+    return 1;
+  }
+
+  printf("error: getvar: invalid variable name\n");
+  return 0;
 }
 
 
