@@ -179,9 +179,10 @@ int get_var(char c, double *d)
 
 
 #include <ctype.h>
+#include <string.h>
 
 int getch(void);
-void ungetch(int);
+int m_getline(void);
 
 /* getop: get next operator or numeric operand */
 int getop(char s[])
@@ -205,38 +206,33 @@ int getop(char s[])
     while (isdigit(s[++i] = c = getch()))
       ;
   s[i] = '\0';
-  if (c != EOF)
-    ungetch(c);
   return NUMBER;
 }
 
+#define LINE_LIMIT 100
+char line[LINE_LIMIT];
+unsigned long int str_length = 0;
+unsigned long int line_index = 0;
 
-char buf; /* buffer for ungetch */
-bool buff; /* whether buf is filled */
-
-int getch(void) /* get a (possibly pushed back) character */
+int getch(void) /* get a character */
 {
-  char c = buff ? buf : getchar();
-  buff = false;
-  return c;
+  if (line_index >= str_length || line[line_index] == '\0') {
+    m_getline();
+    line_index = 0;
+  }
+  return line[line_index++];
 }
 
-void ungetch(int c) /* push character back on input */
+int m_getline(void)
 {
-  buff = true;
-  buf = c;
-}
+  int c, i, lim = LINE_LIMIT;
 
-void ungets(char s[]) /* push string back on input */
-{
-  int i;
-
-  for (i = 0; s[i] != '\0'; ++i)
-    ;
-  --i; /* gives last character */
-
-  if (i < 0)
-    printf("error: ungets: empty string\n");
-  else
-    buf = s[i];
+  i = 0;
+  while (--lim > 0 && (c = getchar()) != EOF && c != '\n')
+    line[i++] = c;
+  if (c == '\n')
+    line[i++] = c;
+  line[i++] = '\0';
+  str_length = i;
+  return i;
 }
