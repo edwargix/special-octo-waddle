@@ -20,7 +20,7 @@ int day_of_year(int year, int month, int day)
 
   int i;
   for (i = 1; i < month; i++)
-    day += daytab[leap][i];
+    day += *(daytab[leap] + i);
   return day;
 }
 
@@ -35,16 +35,16 @@ void month_day(int year, int yearday, int *pmonth, int *pday)
 
   int i;
   for (i = 1; yearday > daytab[leap][i]; i++)
-    yearday -= daytab[leap][i];
+    yearday -= *(daytab[leap] + i);
   *pmonth = i;
   *pday = yearday;
 }
 
 int main()
 {
-  printf("day_of_year(1900, 13, 10): %d\n", day_of_year(1900, 13, 10));
+  printf("day_of_year(1900, 12, 30): %d\n", day_of_year(1900, 12, 30));
   int month[2], day[2];
-  month_day(2017, 377, month, day);
-  printf("month_day(2017, 377): month: %d, day: %d\n", *month, *day);
+  month_day(2017, 365, month, day);
+  printf("month_day(2017, 365): month: %d, day: %d\n", *month, *day);
   return 0;
 }
